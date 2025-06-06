@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Load data
-df = pd.read_csv(r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv")
+df = pd.read_csv(r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv",encoding='unicode_escape')
 
 # Rename columns if necessary (example: remove spaces)
 df.columns = [col.strip().replace(" ", "_") for col in df.columns]
