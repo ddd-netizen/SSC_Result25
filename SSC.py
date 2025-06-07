@@ -1,9 +1,20 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import matplotlib.pyplot as plt
 
+import os
 # Load data
-df = pd.read_csv(r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv",encoding='unicode_escape')
+
+#df = pd.read_csv(r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv",encoding='unicode_escape')
+
+file_path = r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv"
+
+if os.path.exists(file_path):
+    df = pd.read_csv(file_path)
+else:
+    print("File not found. Please check the file path.")
+
 
 # Rename columns if necessary (example: remove spaces)
 df.columns = [col.strip().replace(" ", "_") for col in df.columns]
@@ -26,8 +37,40 @@ st.title("📊 SSC Dashboard 2024-25")
 # KPI metrics
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Students", len(filtered_df))
-col2.metric("Average Marks", round(filtered_df['Total'].mean(), 2))
-col3.metric("Gender Ratio (F:M)", f"{(filtered_df['Gender'].value_counts().get('F', 0))}:{(filtered_df['Gender'].value_counts().get('M', 0))}")
+col2.metric("Average Percentage", round(filtered_df['Percentage'].mean(), 2))
+
+male_count = len(filtered_df[filtered_df['Gender'].str.lower() == 'male'])
+female_count = len(filtered_df[filtered_df['Gender'].str.lower() == 'female'])
+
+# Handle division by zero
+if female_count > 0:
+    gender_ratio = male_count / female_count
+    col3.metric(label="Gender Ratio (M:F)", value=f"{gender_ratio:.2f} : 1")
+else:
+    col3.metric(label="Gender Ratio:** Cannot calculate (No female data)")
+
+#col3.metric("Gender Ratio (F:M)", f"{(filtered_df['Gender'].value_counts().get('F', 0))}:{(filtered_df['Gender'].value_counts().get('M', 0))}")
+
+
+cl1,cl2,cl3=st.columns(3)
+total_students = len(filtered_df)
+passed_students = filtered_df['Result'].str.lower().eq('pass').sum()  # case-insensitive match
+pass_percentage = (passed_students / total_students) * 100
+
+# Display in Streamlit
+cl1.metric(label="Total Students", value=total_students)
+cl2.metric(label="Passed Students", value=passed_students)
+cl3.metric(label="Pass Percentage", value=f"{pass_percentage:.2f}%")
+
+male_count = len(filtered_df[filtered_df['Gender'].str.lower() == 'male'])
+female_count = len(filtered_df[filtered_df['Gender'].str.lower() == 'female'])
+
+# Handle division by zero
+if female_count > 0:
+    gender_ratio = male_count / female_count
+    st.write(f"**Gender Ratio (M:F):** {male_count}:{female_count} or {gender_ratio:.2f} : 1")
+else:
+    st.write("**Gender Ratio:** Cannot calculate (No female data)")
 
 # Bar Chart: Region-wise student count
 st.subheader("👥 Students Count by Region")
@@ -47,9 +90,7 @@ st.subheader("📈 Pie Chart: Top 5 Students by Region")
 # Top 5 students overall from filtered data
 top5_students = filtered_df.sort_values(by='Total', ascending=False).head(5)
 
-# Count of students by region among top 5
-top5_region_count = top5_students['Region'].value_counts().reset_index()
-top5_region_count.columns = ['Region', 'Count']
+
 # Pie Chart: Top 5 Students Region-wise
 st.subheader("📈 Pie Chart: Top 5 Students by Region")
 
@@ -90,6 +131,14 @@ fig_center_pie = px.pie(
 )
 fig_center_pie.update_traces(textposition='inside', textinfo='percent+label')
 
+
+gender_counts = filtered_df['Gender'].value_counts()
+
+# Pie chart
+fig, ax = plt.subplots()
+ax.pie(gender_counts, labels=gender_counts.index, autopct='%1.1f%%', startangle=30)
+ax.axis('equal')
+st.pyplot(fig)
 # Show chart
 st.plotly_chart(fig_center_pie, use_container_width=True)
 
