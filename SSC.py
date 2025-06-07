@@ -6,14 +6,9 @@ import matplotlib.pyplot as plt
 import os
 # Load data
 
-#df = pd.read_csv(r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv",encoding='unicode_escape')
+df = pd.read_csv("SSC Result2 24-25.csv")
 
-file_path = r"C:\Users\LOLT\OneDrive\Desktop\SSC Result2 24-25.csv"
 
-if os.path.exists(file_path):
-    df = pd.read_csv(file_path)
-else:
-    print("File not found. Please check the file path.")
 
 
 # Rename columns if necessary (example: remove spaces)
