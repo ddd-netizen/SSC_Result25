@@ -8,9 +8,6 @@ import os
 
 df = pd.read_csv("SSC Result2 24-25.csv")
 
-
-
-
 # Rename columns if necessary (example: remove spaces)
 df.columns = [col.strip().replace(" ", "_") for col in df.columns]
 
